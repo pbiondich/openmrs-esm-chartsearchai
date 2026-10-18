@@ -2,7 +2,7 @@ import React from 'react';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useConfig, usePatient } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig, usePatient } from '@openmrs/esm-framework';
 import AiSearchButton from './ai-search-button.component';
 
 const mockUsePatient = usePatient as Mock;
@@ -26,6 +26,12 @@ describe('AiSearchButton', () => {
   it('renders the AI button', () => {
     render(<AiSearchButton />);
     expect(screen.getByRole('button', { name: /ai search/i })).toBeInTheDocument();
+  });
+
+  it.each(['floating', 'workspace', 'both'])('sends no request when a chart opens (chatLaunchMode "%s")', (mode) => {
+    mockUseConfig.mockReturnValue({ chatLaunchMode: mode });
+    render(<AiSearchButton />);
+    expect(openmrsFetch).not.toHaveBeenCalled();
   });
 
   it('opens the search panel when clicked', async () => {

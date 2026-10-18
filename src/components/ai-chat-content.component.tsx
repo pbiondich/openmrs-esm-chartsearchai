@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
 import { Close, Microphone, MicrophoneFilled, Send, StopFilled } from '@carbon/react/icons';
 import { InlineLoading } from '@carbon/react';
+import { warmupPatient } from '../api/chartsearchai';
 import { useChartSearchAi } from '../hooks/useChartSearchAi';
 import { answerLimitsOf } from '../utils/answer-limits';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
@@ -29,6 +30,17 @@ const AiChatContent: React.FC<AiChatContentProps> = ({ mode, onClose, patientUui
   const historyAreaRef = useRef<HTMLDivElement>(null);
 
   const { messages, isAnyLoading, submitQuestion, stopCurrent } = useChartSearchAi(patientUuid);
+
+  // Pre-warm the server-side LLM prompt cache while the clinician types, so the first question
+  // skips the full chart prefill. Fired when the chat opens, not when the chart does: every chart
+  // open used to spend a request, including charts where nobody asks anything. The cleanup aborts
+  // an in-flight warmup on a patient switch or when the chat closes.
+  useEffect(() => {
+    if (!patientUuid) return;
+    const controller = new AbortController();
+    warmupPatient(patientUuid, controller.signal);
+    return () => controller.abort();
+  }, [patientUuid]);
 
   const questionRef = useRef(question);
   questionRef.current = question;
