@@ -154,7 +154,8 @@ const ChartSearchAnswerView: React.FC<OmnibarViewProps> = ({
   const { t } = useTranslation();
   const patientUuid = context.scope === 'patient' ? context.patientUuid : undefined;
   const question = query.trim();
-  const offered = useChartSearchOffer(question, patientUuid, hints);
+  // Mounted under /ask, or for a plain query. Under /ask any text is a question.
+  const offered = useChartSearchOffer(question, patientUuid, hints, context.command?.id === 'ask');
 
   const [state, dispatch] = useReducer(reducer, initialState);
   const controller = useRef<AbortController | null>(null);

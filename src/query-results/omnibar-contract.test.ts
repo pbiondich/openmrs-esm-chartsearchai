@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import routes from '../routes.json';
+import en from '../../translations/en.json';
 import { OMNIBAR_CONTRACT_VERSION, OMNIBAR_QUERY_RESULTS_SLOT, type OmnibarViewMeta } from '../omnibar-contract/types';
 
 /**
@@ -21,8 +22,16 @@ describe('the Query results view registration', () => {
     expect((view?.meta as OmnibarViewMeta).contract).toBe(OMNIBAR_CONTRACT_VERSION);
   });
 
-  it('declares /ask, as the omnibar’s built-in view did, so no other command mounts it', () => {
-    expect((view?.meta as OmnibarViewMeta).command).toEqual({ id: 'ask' });
+  it('declares /ask with both its aliases, as the omnibar’s built-in view did, so no other command mounts it', () => {
+    expect((view?.meta as OmnibarViewMeta).command).toEqual({ id: 'ask', aliases: ['ask', 'question'] });
+  });
+
+  it('gives the bar /ask’s translated aliases, label and description', () => {
+    expect(en).toMatchObject({
+      'omnibarCommand.ask.aliases': 'ask, question',
+      'omnibarCommand.ask.label': 'Ask ChartSearch',
+      'omnibarCommand.ask.description': 'Ask ChartSearch, an AI, about this chart',
+    });
   });
 
   it('mounts on nothing from the omnibar but the copied folder', () => {
