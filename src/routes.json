@@ -23,6 +23,7 @@
         "contract": 1,
         "skipIdentifierQueries": true,
         "asksModel": "ChartSearch",
+        "commandAsksModel": true,
         "command": { "id": "ask", "aliases": ["ask", "question"] }
       }
     }
