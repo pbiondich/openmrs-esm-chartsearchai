@@ -190,6 +190,35 @@ describe('AiChatContent', () => {
     });
   });
 
+  describe('initial question', () => {
+    it('prefills and focuses the input, and sends nothing until the clinician does', async () => {
+      const user = userEvent.setup();
+      render(<AiChatContent mode="workspace" patientUuid="p1" initialQuestion="  What meds is she on?  " />);
+
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveValue('What meds is she on?');
+      expect(input).toHaveFocus();
+      expect(mockSubmitQuestion).not.toHaveBeenCalled();
+
+      await user.keyboard('{Enter}');
+      expect(mockSubmitQuestion).toHaveBeenCalledOnce();
+      expect(mockSubmitQuestion).toHaveBeenCalledWith('p1', 'What meds is she on?');
+    });
+
+    it('clamps the prefilled question to maxQuestionLength', () => {
+      mockUseConfig.mockReturnValue({ aiSearchPlaceholder: 'Ask AI...', maxQuestionLength: 10, showReasoning: true });
+      render(<AiChatContent mode="workspace" patientUuid="p1" initialQuestion="What meds is she on?" />);
+      expect(screen.getByRole('textbox')).toHaveValue('What meds ');
+    });
+
+    it('leaves the workspace input empty and unfocused without one', () => {
+      render(<AiChatContent mode="workspace" patientUuid="p1" />);
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveValue('');
+      expect(input).not.toHaveFocus();
+    });
+  });
+
   describe('speech recognition', () => {
     it('appends transcript to existing text and auto-submits', async () => {
       const user = userEvent.setup();

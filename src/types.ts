@@ -10,4 +10,16 @@ export interface PatientWorkspaceGroupProps {
 
 export interface PatientChartWorkspaceActionButtonProps {
   groupProps: PatientWorkspaceGroupProps;
+  workspaceProps?: AiChatWorkspaceProps | null;
+}
+
+/**
+ * Props another module can pass when it launches `ai-chat-workspace`, e.g.
+ * `launchWorkspace2('ai-chat-workspace', { initialQuestion, patientUuid })`.
+ */
+export interface AiChatWorkspaceProps {
+  /** Prefills the chat input. It is never sent on its own: the clinician still presses Send. */
+  initialQuestion?: string;
+  /** The patient the question was asked about. A question about any other patient is dropped. */
+  patientUuid?: string;
 }

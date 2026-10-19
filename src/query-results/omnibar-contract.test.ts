@@ -26,6 +26,10 @@ describe('the Query results view registration', () => {
     expect((view?.meta as OmnibarViewMeta).command).toEqual({ id: 'ask', aliases: ['ask', 'question'] });
   });
 
+  it('marks /ask as a command that asks ChartSearch, which the omnibar reads from the flag, not the id', () => {
+    expect(view?.meta).toMatchObject({ asksModel: 'ChartSearch', commandAsksModel: true });
+  });
+
   it('gives the bar /ask’s translated aliases, label and description', () => {
     expect(en).toMatchObject({
       'omnibarCommand.ask.aliases': 'ask, question',
