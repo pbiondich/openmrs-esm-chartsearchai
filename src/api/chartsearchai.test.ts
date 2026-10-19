@@ -5,6 +5,7 @@ import {
   searchPatientChart,
   searchPatientChartStream,
   SESSION_EXPIRED_ERROR_CODE,
+  warmupPatient,
   type AiSearchResponse,
 } from './chartsearchai';
 
@@ -91,6 +92,34 @@ describe('searchPatientChart', () => {
     await searchPatientChart('uuid-1', 'q', ac);
 
     expect(mockOpenmrsFetch).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({ signal: ac.signal }));
+  });
+});
+
+// ── warmupPatient ──────────────────────────────────────────────────────
+
+describe('warmupPatient', () => {
+  it('POSTs the patient to /warmup with the abort signal', () => {
+    mockOpenmrsFetch.mockResolvedValueOnce({});
+    const ac = new AbortController();
+
+    warmupPatient('uuid-1', ac.signal);
+
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith(
+      '/ws/rest/v1/chartsearchai/warmup',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ patient: 'uuid-1' }),
+        signal: ac.signal,
+      }),
+    );
+  });
+
+  it('swallows a failed or aborted warmup', async () => {
+    mockOpenmrsFetch.mockRejectedValueOnce(new DOMException('The operation was aborted.', 'AbortError'));
+
+    expect(() => warmupPatient('uuid-1')).not.toThrow();
+    // An unhandled rejection here would fail the run.
+    await flushPromises();
   });
 });
 
