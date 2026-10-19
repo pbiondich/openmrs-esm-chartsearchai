@@ -35,7 +35,7 @@ export const configSchema = {
       _type: Type.Boolean,
       _default: true,
       _description:
-        'Whether the section is shown. When false it renders nothing and never asks ChartSearch. Removing chartsearch-query-results-view from omnibar-query-results-slot does the same.',
+        "Whether the section is shown. When false it renders nothing and never asks ChartSearch. The omnibar's hint still says Enter will ask ChartSearch while the extension is assigned, so removing chartsearch-query-results-view from omnibar-query-results-slot instead drops both the section and the hint.",
     },
   },
 };

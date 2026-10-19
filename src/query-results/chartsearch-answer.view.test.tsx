@@ -178,7 +178,17 @@ describe('the Ask ChartSearch view', () => {
   });
 
   it('with no `submitted` from the host, shows the Ask button and sends nothing', async () => {
-    const { states } = renderView(question, undefined);
+    const states: Array<OmnibarViewState> = [];
+    const props: OmnibarViewProps = {
+      query: question,
+      context: { scope: 'patient', patientUuid: humprey, locale: 'en' },
+      contractVersion: 1,
+      reportState: (state) => {
+        states.push(state);
+      },
+    };
+    expect(props).not.toHaveProperty('submitted');
+    render(<ChartSearchAnswerView {...props} />);
 
     expect(await screen.findByRole('button', { name: 'Ask ChartSearch' })).toBeInTheDocument();
     await waitFor(() => expect(states.at(-1)).toBe('ready'));
