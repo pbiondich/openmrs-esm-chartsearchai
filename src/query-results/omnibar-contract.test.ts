@@ -22,7 +22,7 @@ describe('the Query results view registration', () => {
     expect((view?.meta as OmnibarViewMeta).contract).toBe(OMNIBAR_CONTRACT_VERSION);
   });
 
-  it('declares /ask with both its aliases, as the omnibar’s built-in view did, so no other command mounts it', () => {
+  it('declares /ask with both its aliases, which the omnibar’s suggestion provider and catalogue held, so no other command mounts it', () => {
     expect((view?.meta as OmnibarViewMeta).command).toEqual({ id: 'ask', aliases: ['ask', 'question'] });
   });
 
