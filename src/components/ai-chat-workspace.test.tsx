@@ -6,8 +6,21 @@ import AiChatWorkspace from './ai-chat-workspace.component';
 
 vi.mock('./ai-chat-content.component', () => ({
   __esModule: true,
-  default: ({ mode, patientUuid }: { mode: string; patientUuid: string }) => (
-    <div data-testid="ai-chat-content" data-mode={mode} data-patient-uuid={patientUuid} />
+  default: ({
+    mode,
+    patientUuid,
+    initialQuestion,
+  }: {
+    mode: string;
+    patientUuid: string;
+    initialQuestion?: string;
+  }) => (
+    <div
+      data-testid="ai-chat-content"
+      data-mode={mode}
+      data-patient-uuid={patientUuid}
+      data-initial-question={initialQuestion}
+    />
   ),
 }));
 
@@ -45,5 +58,30 @@ describe('AiChatWorkspace', () => {
   it('passes patientUuid from groupProps to AiChatContent', () => {
     render(<AiChatWorkspace {...baseProps} />);
     expect(screen.getByTestId('ai-chat-content')).toHaveAttribute('data-patient-uuid', 'test-patient-uuid');
+  });
+
+  it('passes an initial question asked about this patient to AiChatContent', () => {
+    render(
+      <AiChatWorkspace
+        {...baseProps}
+        workspaceProps={{ initialQuestion: 'What meds?', patientUuid: 'test-patient-uuid' }}
+      />,
+    );
+    expect(screen.getByTestId('ai-chat-content')).toHaveAttribute('data-initial-question', 'What meds?');
+  });
+
+  it('passes an initial question that names no patient to AiChatContent', () => {
+    render(<AiChatWorkspace {...baseProps} workspaceProps={{ initialQuestion: 'What meds?' }} />);
+    expect(screen.getByTestId('ai-chat-content')).toHaveAttribute('data-initial-question', 'What meds?');
+  });
+
+  it('drops an initial question asked about another patient', () => {
+    render(
+      <AiChatWorkspace
+        {...baseProps}
+        workspaceProps={{ initialQuestion: 'What meds?', patientUuid: 'other-patient' }}
+      />,
+    );
+    expect(screen.getByTestId('ai-chat-content')).not.toHaveAttribute('data-initial-question');
   });
 });

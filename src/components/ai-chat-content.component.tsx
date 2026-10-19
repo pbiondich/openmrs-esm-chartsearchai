@@ -16,15 +16,23 @@ interface AiChatContentProps {
   mode: 'floating' | 'workspace';
   onClose?: () => void;
   patientUuid?: string;
+  /** Prefills the input; the clinician still sends it. */
+  initialQuestion?: string;
 }
 
-const AiChatContent: React.FC<AiChatContentProps> = ({ mode, onClose, patientUuid: patientUuidProp }) => {
+const AiChatContent: React.FC<AiChatContentProps> = ({
+  mode,
+  onClose,
+  patientUuid: patientUuidProp,
+  initialQuestion,
+}) => {
   const { t } = useTranslation();
   const config = useConfig<ChartSearchAiConfig>();
   const { patient, isLoading: isPatientLoading } = usePatient();
   const patientUuid = patientUuidProp ?? patient?.id;
 
-  const [question, setQuestion] = useState('');
+  // Clamped here because the input's `maxLength` only stops typing, not a value set in code.
+  const [question, setQuestion] = useState(() => initialQuestion?.trim().slice(0, config.maxQuestionLength) ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const historyAreaRef = useRef<HTMLDivElement>(null);
@@ -320,7 +328,7 @@ const AiChatContent: React.FC<AiChatContentProps> = ({ mode, onClose, patientUui
           placeholder={config.aiSearchPlaceholder}
           maxLength={config.maxQuestionLength}
           disabled={isAnyLoading}
-          autoFocus={mode === 'floating'}
+          autoFocus={mode === 'floating' || Boolean(initialQuestion)}
         />
         {isSpeechSupported && !isAnyLoading && (
           <button
