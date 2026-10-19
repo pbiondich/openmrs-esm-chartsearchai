@@ -28,6 +28,16 @@ export const configSchema = {
     _description: 'Controls how the AI chat panel is launched. One of: "floating", "workspace", "both"',
     _validators: [validators.oneOf(['floating', 'workspace', 'both'])],
   },
+  queryResultsAnswer: {
+    _description:
+      "ChartSearch's section on the omnibar's Query results page, which answers a question the user just submitted there.",
+    enabled: {
+      _type: Type.Boolean,
+      _default: true,
+      _description:
+        'Whether the section is shown. When false it renders nothing and never asks ChartSearch. Removing chartsearch-query-results-view from omnibar-query-results-slot does the same.',
+    },
+  },
 };
 
 export interface ChartSearchAiConfig {
@@ -36,4 +46,5 @@ export interface ChartSearchAiConfig {
   useStreaming: boolean;
   showReasoning: boolean;
   chatLaunchMode: 'floating' | 'workspace' | 'both';
+  queryResultsAnswer: { enabled: boolean };
 }
