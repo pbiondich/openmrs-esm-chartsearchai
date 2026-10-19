@@ -21,6 +21,10 @@ describe('the Query results view registration', () => {
     expect((view?.meta as OmnibarViewMeta).contract).toBe(OMNIBAR_CONTRACT_VERSION);
   });
 
+  it('declares /ask, as the omnibar’s built-in view did, so no other command mounts it', () => {
+    expect((view?.meta as OmnibarViewMeta).command).toEqual({ id: 'ask' });
+  });
+
   it('mounts on nothing from the omnibar but the copied folder', () => {
     const dir = __dirname;
     const imports = fs

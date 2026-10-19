@@ -22,7 +22,8 @@
         "order": 100,
         "contract": 1,
         "skipIdentifierQueries": true,
-        "asksModel": "ChartSearch"
+        "asksModel": "ChartSearch",
+        "command": { "id": "ask" }
       }
     }
   ],

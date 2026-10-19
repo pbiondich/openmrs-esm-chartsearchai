@@ -33,6 +33,24 @@ export interface OmnibarContext {
    * the results or remounts providers. Hosts from before contract 1 was published don't pass it.
    */
   workspaceGroup?: OmnibarWorkspaceGroup | null;
+  /**
+   * The slash command in force, such as `{ id: 'lab' }` for `/lab cd4`. Set only for providers that
+   * declare that id, and for views that do. New in v1 and optional; a provider must work without it.
+   */
+  command?: { id: string };
+}
+
+/**
+ * A slash command a provider answers, new in v1 and optional. `id` is stable, lower-case ASCII
+ * (letters, digits and hyphens, starting with a letter), never shown and never translated: URLs,
+ * history and config use it. `aliases` are the English names people type after the slash, without the
+ * slash, each one word. Translated aliases, the label and the description come from the provider
+ * module's translations: `omnibarCommand.<id>.aliases` (comma-separated), `.label` and `.description`.
+ * Several providers may declare the same id; their aliases are merged and all of them run.
+ */
+export interface OmnibarCommand {
+  id: string;
+  aliases: Array<string>;
 }
 
 export interface OmnibarWorkspaceGroup {
@@ -90,6 +108,13 @@ export interface OmnibarProviderMeta {
    * nothing isn't shown at all.
    */
   dedupeKey?: string;
+  /**
+   * The slash command this provider answers, new in v1 and optional. With a command chosen in the bar,
+   * only providers declaring its id are mounted, under every other rule here as well, and they get it
+   * as `context.command`. Every provider still runs for plain text; one that declares no command isn't
+   * mounted while a command is chosen.
+   */
+  command?: OmnibarCommand;
 }
 
 /** Facts about the query, worked out once by the host for every provider. */
@@ -261,11 +286,18 @@ export interface OmnibarViewMeta {
   /** As for providers: not mounted while the query looks like a patient identifier. */
   skipIdentifierQueries?: boolean;
   /**
+   * The slash command this view shows results for, new in v1 and optional. A query sent with a
+   * command mounts only the views declaring its id; a view without one mounts only for plain queries.
+   * Aliases are the bar's business, so a view gives only the id.
+   */
+  command?: { id: string };
+  /**
    * New in v1. The view may call a model for a query the user just submitted, and this is the name the
    * bar's hint uses: "Enter to see all results for '…' and ask ChartSearch". Shown as written, so it
    * is a product name, not a sentence. The bar says it only while the view is assigned to the user and
-   * isn't skipped for the query, and the query looks like a question by the same test the host passes
-   * as `hints.looksLikeQuestion`.
+   * would be mounted for what was typed (not skipped for the query, and declaring the command when one
+   * is chosen), and the query looks like a question by the same test the host passes as
+   * `hints.looksLikeQuestion`.
    */
   asksModel?: string;
 }
